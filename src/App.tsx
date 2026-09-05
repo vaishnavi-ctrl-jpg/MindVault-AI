@@ -46,8 +46,11 @@ export const AppContent: React.FC = () => {
           <JournalChat
             onEntrySaved={handleEntrySaved}
             openVoiceModal={() => setIsVoiceOpen(true)}
+            openExportModal={() => setIsExportOpen(true)}
             recordedVoiceText={voiceText}
             clearVoiceText={() => setVoiceText('')}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
           />
         )}
         {activeTab === 'history' && (
