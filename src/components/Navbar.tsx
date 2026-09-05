@@ -21,17 +21,17 @@ export const Navbar: React.FC<NavbarProps> = ({
   return (
     <header className="navbar-container">
       <div className="navbar-inner">
-        {/* Brand Header */}
+        {/* Brand Header Left */}
         <div className="brand-section" onClick={openSecurityModal}>
-          <TreeRingLogo size={46} />
+          <TreeRingLogo size={48} />
           <div>
             <h1 className="brand-title">BioVault</h1>
             <p className="brand-subtitle">Secure Personal Journal & Knowledge Database</p>
           </div>
         </div>
 
-        {/* Header Action Buttons */}
-        <div className="header-actions">
+        {/* Top-Right Curved Layer Housing Action Buttons */}
+        <div className="top-right-curved-layer">
           {/* Active Ledger Status Pill */}
           <button 
             className="status-pill-ledger" 

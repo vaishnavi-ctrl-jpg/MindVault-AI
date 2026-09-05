@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { ChatMessage, JournalEntry } from '../types';
 import { sendChatMessage, generateEntrySummary } from '../services/api';
 import { saveUserJournal } from '../services/firestore';
-import { BookLockVector } from './BioVaultLogo';
+import { BookLockVector, SparkleStar } from './BioVaultLogo';
 import DOMPurify from 'dompurify';
 import confetti from 'canvas-confetti';
 import { 
@@ -42,8 +42,8 @@ export const JournalChat: React.FC<JournalChatProps> = ({
     {
       id: 'welcome-msg',
       role: 'model',
-      text: `Hello! Welcome to your local **BioVault** archive. Your confidential notes and records in this private space are reserved for your own review and goal tracking.\n\nAll entries are secured in personal database isolation and local GCM-256 key-based protection. What will you archive or review today?`,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      text: `Hello! Welcome to your local **BioVault** archive. Your confidential notes and records in this private space for your own review and goal tracking.\n\nAll entries are secured in personal database isolation and local GCM-256 key-based protection. What will you archive or review today?`,
+      timestamp: 'Dec 15, 2023 | 04:03 PM'
     }
   ]);
   const [inputText, setInputText] = useState('');
@@ -143,28 +143,21 @@ export const JournalChat: React.FC<JournalChatProps> = ({
     }
   };
 
-  const formattedCurrentTime = new Date().toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric'
-  }) + ' | ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
   return (
     <div className="biovault-container">
-      {/* Vertical Thread Slider Bar */}
-      <div className="thread-slider-bar">
-        <div className="thread-line">
-          <div className="thread-node n1"></div>
-          <div className="thread-node n2"></div>
-          <div className="thread-handle"></div>
-          <div className="thread-node n3"></div>
-          <div className="thread-node n4"></div>
-        </div>
+      {/* Left Vertical Inset Groove Track with Metallic Handle & Thread */}
+      <div className="left-slider-track">
+        <div className="vertical-thread-line"></div>
+        <div className="slider-node"></div>
+        <div className="slider-node"></div>
+        <div className="slider-handle-pill"></div>
+        <div className="slider-node"></div>
+        <div className="slider-node"></div>
       </div>
 
       {/* Main Folder Wrapper */}
       <div className="folder-wrapper">
-        {/* Top Cut-Out Tabs Bar */}
+        {/* Top Folder Header Tabs Bar */}
         <div className="folder-tabs-bar">
           <h2 className="folder-title-tag">Archive View</h2>
 
@@ -190,22 +183,22 @@ export const JournalChat: React.FC<JournalChatProps> = ({
           </div>
         </div>
 
-        {/* Folder Main Content Body Card */}
+        {/* Main Folder Content Body Card */}
         <div className="folder-body-card">
-          {/* Header Info with Vector Art */}
+          {/* Header View with Book-Lock Vector Artwork */}
           <div className="archive-view-header">
             <div className="archive-header-text">
               <h3>Journal Entry (Confidential Archive)</h3>
-              <div className="timestamp-sub">{formattedCurrentTime}</div>
+              <div className="timestamp-sub">Dec 15, 2023 | 04:03 PM</div>
             </div>
-            <BookLockVector size={110} />
+            <BookLockVector size={125} />
           </div>
 
-          {/* Chat Messages Stream */}
+          {/* Messages Stream */}
           <div className="archive-chat-scroll">
             {messages.map(m => (
               <div key={m.id} className={`message-bubble-biovault ${m.role}`}>
-                <div className="archive-text-block">
+                <div className="archive-welcome-text">
                   {m.text.split('\n').map((line, i) => (
                     <p key={i}>{line}</p>
                   ))}
@@ -215,7 +208,7 @@ export const JournalChat: React.FC<JournalChatProps> = ({
 
             {isTyping && (
               <div className="message-bubble-biovault model">
-                <div className="archive-text-block">
+                <div className="archive-welcome-text">
                   <em>BioVault AI is indexing and reflecting...</em>
                 </div>
               </div>
@@ -253,7 +246,7 @@ export const JournalChat: React.FC<JournalChatProps> = ({
               onClick={() => handleSend()}
               title="Submit Record"
             >
-              <Check size={22} />
+              <Check size={24} />
             </button>
           </div>
 
@@ -268,7 +261,7 @@ export const JournalChat: React.FC<JournalChatProps> = ({
 
             <div className="flex-center">
               {saveSuccess && (
-                <span className="save-toast text-emerald" style={{ marginRight: '0.8rem', color: '#FAF6EE' }}>
+                <span className="save-toast" style={{ marginRight: '0.8rem', color: '#FAF6EE' }}>
                   <CheckCircle2 className="nano-icon" /> Entry Archived!
                 </span>
               )}
@@ -289,6 +282,9 @@ export const JournalChat: React.FC<JournalChatProps> = ({
               </button>
             </div>
           </div>
+
+          {/* Sparkle Star Accent Glimmer (✦) at Bottom Right */}
+          <SparkleStar size={24} className="sparkle-accent-floating" />
         </div>
       </div>
     </div>
