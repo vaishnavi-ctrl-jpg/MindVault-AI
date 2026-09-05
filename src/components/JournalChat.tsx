@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { AIPersona, ChatMessage, JournalEntry } from '../types';
 import { sendChatMessage, generateEntrySummary } from '../services/api';
 import { saveUserJournal } from '../services/firestore';
+import DOMPurify from 'dompurify';
 import confetti from 'canvas-confetti';
 import { 
   Send, 
@@ -13,10 +14,8 @@ import {
   Bot, 
   User as UserIcon, 
   CheckCircle2, 
-  ShieldAlert,
   Brain,
-  Zap,
-  Feather
+  Zap
 } from 'lucide-react';
 
 interface JournalChatProps {
@@ -51,7 +50,7 @@ export const JournalChat: React.FC<JournalChatProps> = ({
     {
       id: 'welcome-msg',
       role: 'model',
-      text: `Hello ${user?.displayName || 'there'}! Welcome to your private **MindVault**. I'm here as your confidential Gemini companion to help you process thoughts, set goals, or journal freely.\n\nEverything you record here is protected by **zero-trust user database isolation** and encrypted secret management.\n\n*What would you like to reflect on today?*`,
+      text: `Hello ${user?.displayName || 'there'}! Welcome to your private **MindVault**. I'm here as your confidential Gemini companion to help you process thoughts, set goals, or journal freely.\n\nEverything you record here is protected by **zero-trust user database isolation**, AES-GCM-256 encryption, and Secret Manager key security.\n\n*What would you like to reflect on today?*`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
   ]);
@@ -69,19 +68,23 @@ export const JournalChat: React.FC<JournalChatProps> = ({
 
   useEffect(() => {
     if (recordedVoiceText) {
-      setInputText(prev => (prev ? prev + ' ' + recordedVoiceText : recordedVoiceText));
+      const sanitizedVoice = DOMPurify.sanitize(recordedVoiceText);
+      setInputText(prev => (prev ? prev + ' ' + sanitizedVoice : sanitizedVoice));
       if (clearVoiceText) clearVoiceText();
     }
   }, [recordedVoiceText]);
 
   const handleSend = async (textToSend?: string) => {
-    const text = textToSend || inputText;
-    if (!text.trim() || isTyping) return;
+    const rawText = textToSend || inputText;
+    if (!rawText.trim() || isTyping) return;
+
+    // DOMPurify XSS Sanitization
+    const sanitizedText = DOMPurify.sanitize(rawText.trim());
 
     const userMsg: ChatMessage = {
       id: 'user-' + Date.now(),
       role: 'user',
-      text: text.trim(),
+      text: sanitizedText,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
 
@@ -90,11 +93,13 @@ export const JournalChat: React.FC<JournalChatProps> = ({
     setIsTyping(true);
 
     try {
-      const replyText = await sendChatMessage(messages, text, persona);
+      const rawReply = await sendChatMessage(messages, sanitizedText, persona, user?.uid);
+      const sanitizedReply = DOMPurify.sanitize(rawReply);
+
       const aiMsg: ChatMessage = {
         id: 'ai-' + Date.now(),
         role: 'model',
-        text: replyText,
+        text: sanitizedReply,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
       setMessages(prev => [...prev, aiMsg]);
@@ -112,18 +117,18 @@ export const JournalChat: React.FC<JournalChatProps> = ({
     setIsSaving(true);
     try {
       const conversationText = messages.map(m => `${m.role.toUpperCase()}: ${m.text}`).join('\n\n');
-      const summaryData = await generateEntrySummary(conversationText);
+      const summaryData = await generateEntrySummary(conversationText, user.uid);
 
       const entry: JournalEntry = {
         id: 'journal-' + Date.now(),
         userId: user.uid,
-        title: summaryData.title,
+        title: DOMPurify.sanitize(summaryData.title),
         date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-        summary: summaryData.summary,
-        keyTakeaways: summaryData.keyTakeaways,
+        summary: DOMPurify.sanitize(summaryData.summary),
+        keyTakeaways: summaryData.keyTakeaways.map(t => DOMPurify.sanitize(t)),
         sentiment: summaryData.sentiment,
-        tags: summaryData.tags,
-        emotionalTone: summaryData.emotionalTone,
+        tags: summaryData.tags.map(t => DOMPurify.sanitize(t)),
+        emotionalTone: DOMPurify.sanitize(summaryData.emotionalTone),
         chatHistory: messages,
         personaUsed: persona,
         createdAt: Date.now()

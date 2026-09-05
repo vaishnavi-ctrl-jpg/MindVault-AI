@@ -27,7 +27,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    // Check if guest user session exists in sessionStorage
+    // Check if guest sandbox session exists
     const savedGuest = sessionStorage.getItem('mindvault_guest_user');
     if (savedGuest) {
       try {
@@ -49,15 +49,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           isGuest: false
         });
       } else {
-        // Default to instant Guest Sandbox user for evaluation ease
-        const defaultGuest: UserProfile = {
-          uid: 'demo-user-101',
-          email: 'alex.mindvault@example.com',
-          displayName: 'Alex Rivers (Demo User)',
-          photoURL: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-          isGuest: true
-        };
-        setUser(defaultGuest);
+        // If not authenticated and no guest session, default to null unauthenticated state
+        setUser(null);
       }
       setLoading(false);
     });
@@ -66,29 +59,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const signInWithGoogle = async () => {
+    sessionStorage.removeItem('mindvault_guest_user');
     try {
-      sessionStorage.removeItem('mindvault_guest_user');
       await signInWithPopup(auth, googleProvider);
     } catch (err: any) {
-      console.warn('[Google Auth fallback to Sandbox User]', err.message);
-      // Fallback sandbox login if popup is blocked or unconfigured domain
-      const sandboxUser: UserProfile = {
-        uid: 'user-google-' + Date.now().toString(36),
-        email: 'evaluator.google@gemini-journal.dev',
-        displayName: 'Google Verified User',
-        photoURL: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
-        isGuest: false
-      };
-      sessionStorage.setItem('mindvault_guest_user', JSON.stringify(sandboxUser));
-      setUser(sandboxUser);
+      console.error('[Google Auth Error]', err);
+      throw new Error(`Google Sign-In failed: ${err.message}`);
     }
   };
 
   const signInAsGuest = () => {
     const guestUser: UserProfile = {
-      uid: 'guest-' + Math.random().toString(36).substring(2, 9),
-      email: 'guest@mindvault.local',
-      displayName: 'Guest Reflector',
+      uid: 'guest-sandbox-' + Math.random().toString(36).substring(2, 9),
+      email: 'sandbox@mindvault.local',
+      displayName: 'Guest Sandbox User',
       photoURL: null,
       isGuest: true
     };
@@ -97,37 +81,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signInEmail = async (email: string, pass: string) => {
+    sessionStorage.removeItem('mindvault_guest_user');
     try {
-      sessionStorage.removeItem('mindvault_guest_user');
       await signInWithEmailAndPassword(auth, email, pass);
     } catch (err: any) {
-      // Create local user fallback if demo firebase app
-      const emailUser: UserProfile = {
-        uid: 'user-' + btoa(email).substring(0, 10),
-        email: email,
-        displayName: email.split('@')[0],
-        photoURL: null,
-        isGuest: false
-      };
-      sessionStorage.setItem('mindvault_guest_user', JSON.stringify(emailUser));
-      setUser(emailUser);
+      console.error('[Firebase Email Sign In Error]', err);
+      throw new Error(`Authentication failed: ${err.message}`);
     }
   };
 
   const signUpEmail = async (email: string, pass: string) => {
+    sessionStorage.removeItem('mindvault_guest_user');
     try {
-      sessionStorage.removeItem('mindvault_guest_user');
       await createUserWithEmailAndPassword(auth, email, pass);
     } catch (err: any) {
-      const emailUser: UserProfile = {
-        uid: 'user-' + btoa(email).substring(0, 10),
-        email: email,
-        displayName: email.split('@')[0],
-        photoURL: null,
-        isGuest: false
-      };
-      sessionStorage.setItem('mindvault_guest_user', JSON.stringify(emailUser));
-      setUser(emailUser);
+      console.error('[Firebase Email Sign Up Error]', err);
+      throw new Error(`Registration failed: ${err.message}`);
     }
   };
 

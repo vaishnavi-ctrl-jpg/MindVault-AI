@@ -9,7 +9,6 @@ import {
   Lock, 
   LogOut, 
   User, 
-  Key,
   Database
 } from 'lucide-react';
 
@@ -42,7 +41,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div className="brand-title-wrap">
               <span className="brand-title">MindVault</span>
               <span className="brand-accent">AI</span>
-              <span className="badge-ideathon">Ideathon Project</span>
+              <span className="badge-ideathon">Zero-Trust AI Vault</span>
             </div>
             <p className="brand-subtitle">Secure Gemini Personal Journal & Cognitive Analytics</p>
           </div>

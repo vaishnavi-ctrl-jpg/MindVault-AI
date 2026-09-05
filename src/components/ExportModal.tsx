@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { getUserJournals } from '../services/firestore';
-import { Lock, Download, ShieldCheck, Key, FileText, CheckCircle2, X } from 'lucide-react';
+import { encryptVaultAES256 } from '../utils/crypto';
+import { Lock, Download, Key, FileText, CheckCircle2, X } from 'lucide-react';
 
 interface ExportModalProps {
   isOpen: boolean;
@@ -11,7 +12,7 @@ interface ExportModalProps {
 export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
   const { user } = useAuth();
   const [passphrase, setPassphrase] = useState('');
-  const [format, setFormat] = useState<'md' | 'json' | 'vault'>('md');
+  const [format, setFormat] = useState<'md' | 'json' | 'vault'>('vault');
   const [isExporting, setIsExporting] = useState(false);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
 
@@ -31,7 +32,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
         fileContent = JSON.stringify({
           exportedAt: new Date().toISOString(),
           userIsolatedUid: user.uid,
-          securityDirective: 'AES-256 Client Vault Export',
+          securityDirective: 'Client Vault Export',
           journals: journals
         }, null, 2);
         fileName += '.json';
@@ -60,11 +61,12 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
         fileName += '.md';
         mimeType = 'text/markdown';
       } else {
-        // Vault encrypted export simulation
-        const rawJson = JSON.stringify(journals);
-        fileContent = `--- BEGIN MINDVAULT AES-256 ENCRYPTED CONTAINER ---\nPassphraseHash: ${btoa(passphrase || 'default_vault_key')}\nDataCipher: ${btoa(rawJson)}\n--- END MINDVAULT AES-256 ENCRYPTED CONTAINER ---`;
+        // REAL Web Crypto API AES-GCM-256 Encryption
+        const rawJson = JSON.stringify(journals, null, 2);
+        const secretKey = passphrase.trim() || 'MindVault-AES256-Default-Vault-Key-2026';
+        fileContent = await encryptVaultAES256(rawJson, secretKey);
         fileName += '.mindvault';
-        mimeType = 'text/plain';
+        mimeType = 'application/json';
       }
 
       // Download file
@@ -81,7 +83,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
       setDownloadSuccess(true);
       setTimeout(() => setDownloadSuccess(false), 4000);
     } catch (e) {
-      console.error(e);
+      console.error('[Encryption Export Error]', e);
     } finally {
       setIsExporting(false);
     }
@@ -102,17 +104,17 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
 
         <div className="export-body">
           <p className="export-desc">
-            Export all your personal journal entries from isolated storage. You can secure the export file with client-side AES-256 encryption.
+            Export all your personal journal entries from isolated storage. Secures data using client-side **AES-GCM-256 (PBKDF2 100k iterations)** encryption via Web Crypto API.
           </p>
 
           <div className="form-group">
             <label className="form-label">
-              <Key className="nano-icon" /> Encryption Passphrase (Optional):
+              <Key className="nano-icon" /> AES-256 Encryption Passphrase:
             </label>
             <input
               type="password"
               className="form-input"
-              placeholder="Enter a secret passphrase to lock export..."
+              placeholder="Enter passphrase for PBKDF2 AES-GCM key derivation..."
               value={passphrase}
               onChange={e => setPassphrase(e.target.value)}
             />
@@ -121,6 +123,12 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
           <div className="form-group">
             <label className="form-label">Export Format:</label>
             <div className="format-selector">
+              <button 
+                className={`format-btn ${format === 'vault' ? 'active' : ''}`}
+                onClick={() => setFormat('vault')}
+              >
+                <Lock className="nano-icon" /> AES-256 Vault (.mindvault)
+              </button>
               <button 
                 className={`format-btn ${format === 'md' ? 'active' : ''}`}
                 onClick={() => setFormat('md')}
@@ -131,13 +139,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
                 className={`format-btn ${format === 'json' ? 'active' : ''}`}
                 onClick={() => setFormat('json')}
               >
-                <FileText className="nano-icon" /> JSON Data (.json)
-              </button>
-              <button 
-                className={`format-btn ${format === 'vault' ? 'active' : ''}`}
-                onClick={() => setFormat('vault')}
-              >
-                <Lock className="nano-icon" /> Encrypted Vault (.mindvault)
+                <FileText className="nano-icon" /> JSON (.json)
               </button>
             </div>
           </div>
@@ -145,7 +147,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
           {downloadSuccess && (
             <div className="success-banner">
               <CheckCircle2 className="banner-icon text-emerald" />
-              <span>Vault exported successfully to your downloads!</span>
+              <span>Vault exported successfully with AES-GCM-256 encryption!</span>
             </div>
           )}
         </div>
@@ -155,7 +157,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
             Cancel
           </button>
           <button className="btn-primary-action" onClick={handleExport} disabled={isExporting}>
-            <Download className="nano-icon" /> Export Vault Now
+            <Download className="nano-icon" /> {isExporting ? 'Encrypting...' : 'Export Vault Now'}
           </button>
         </div>
       </div>
