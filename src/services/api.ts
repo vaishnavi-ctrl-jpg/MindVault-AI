@@ -59,17 +59,17 @@ export async function sendChatMessage(
     console.warn('[API Proxy Notice] Using fallback response engine.');
   }
 
-  // Client-side intelligent fallback response engine if dev server port 5000 is offline
+  // Client-side intelligent fallback response engine for Guest/Sandbox users or offline dev
   await new Promise(r => setTimeout(r, 900));
   const lower = message.toLowerCase();
   
   if (lower.includes('stress') || lower.includes('anxious') || lower.includes('overwhelmed')) {
-    return `It sounds like you're carrying a significant amount of weight right now. Take a deep breath with me.\n\nWhen we feel overwhelmed, our minds tend to blur immediate tasks with distant worries. **What is ONE small action within your control today that would bring you a sense of relief?**`;
+    return `*[Sandbox Mode]* It sounds like you're carrying a significant amount of weight right now. Take a deep breath with me.\n\nWhen we feel overwhelmed, our minds tend to blur immediate tasks with distant worries. **What is ONE small action within your control today that would bring you a sense of relief?**\n\n*(Sign in to unlock the full BioVault AI experience and save your entries securely.)*`;
   }
   if (lower.includes('goal') || lower.includes('project') || lower.includes('work') || lower.includes('career')) {
-    return `That sounds like an impactful direction to focus your energy on! Breaking down big ambitions into daily micro-habits builds unstoppable momentum.\n\n* **Primary Milestone:** Define your core metric for success.\n* **Immediate Step:** Dedicate 25 minutes of focus block today.\n\nHow does this align with your personal vision for this week?`;
+    return `*[Sandbox Mode]* That sounds like an impactful direction to focus your energy on! Breaking down big ambitions into daily micro-habits builds unstoppable momentum.\n\n* **Primary Milestone:** Define your core metric for success.\n* **Immediate Step:** Dedicate 25 minutes of focus block today.\n\n*(Sign in to unlock the full BioVault AI experience and save your entries securely.)*`;
   }
-  return `Thank you for sharing your thoughts so openly. Reflecting on this: **${message.substring(0, 60)}...** reveals how deeply you consider your path.\n\nWhat feeling stands out to you most as you write this down?`;
+  return `*[Sandbox Mode]* Thank you for sharing your thoughts so openly. Reflecting on this: **${message.substring(0, 60)}...** reveals how deeply you consider your path.\n\n*(This is a scripted guest response. Sign in with a secure account to unlock the full BioVault AI and encrypted journal storage.)*`;
 }
 
 export async function generateEntrySummary(conversationText: string, userUid?: string): Promise<{

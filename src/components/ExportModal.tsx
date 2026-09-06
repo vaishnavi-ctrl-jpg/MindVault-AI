@@ -25,7 +25,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
     try {
       const journals = await getUserJournals(user.uid);
       let fileContent = '';
-      let fileName = `mindvault_export_${user.uid.substring(0, 6)}_${Date.now()}`;
+      let fileName = `BioVault_export_${user.uid.substring(0, 6)}_${Date.now()}`;
       let mimeType = 'text/plain';
 
       if (format === 'json') {
@@ -38,7 +38,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
         fileName += '.json';
         mimeType = 'application/json';
       } else if (format === 'md') {
-        fileContent = `# MINDVAULT AI - PERSONAL JOURNAL EXPORT\n`;
+        fileContent = `# BioVault AI - PERSONAL JOURNAL EXPORT\n`;
         fileContent += `**User ID**: ${user.uid}\n`;
         fileContent += `**Export Date**: ${new Date().toLocaleString()}\n`;
         fileContent += `**Security Directives**: Enterprise Zero-Trust Isolated Storage\n\n---\n\n`;
@@ -63,9 +63,9 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
       } else {
         // REAL Web Crypto API AES-GCM-256 Encryption
         const rawJson = JSON.stringify(journals, null, 2);
-        const secretKey = passphrase.trim() || 'MindVault-AES256-Default-Vault-Key-2026';
+        const secretKey = passphrase.trim() || 'BioVault-AES256-Default-Vault-Key-2026';
         fileContent = await encryptVaultAES256(rawJson, secretKey);
-        fileName += '.mindvault';
+        fileName += '.BioVault';
         mimeType = 'application/json';
       }
 
@@ -127,7 +127,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
                 className={`format-btn ${format === 'vault' ? 'active' : ''}`}
                 onClick={() => setFormat('vault')}
               >
-                <Lock className="nano-icon" /> AES-256 Vault (.mindvault)
+                <Lock className="nano-icon" /> AES-256 Vault (.BioVault)
               </button>
               <button 
                 className={`format-btn ${format === 'md' ? 'active' : ''}`}

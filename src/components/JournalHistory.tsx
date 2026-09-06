@@ -106,7 +106,7 @@ export const JournalHistory: React.FC<JournalHistoryProps> = ({ refreshTrigger }
       {/* Entry Cards List */}
       {loading ? (
         <div className="loading-state">
-          <Zap className="nano-icon spinner" /> Loading your isolated MindVault entries...
+          <Zap className="nano-icon spinner" /> Loading your isolated BioVault entries...
         </div>
       ) : filteredEntries.length === 0 ? (
         <div className="empty-state">
