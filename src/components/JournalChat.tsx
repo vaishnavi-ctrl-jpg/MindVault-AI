@@ -3,16 +3,13 @@ import { useAuth } from '../context/AuthContext';
 import { ChatMessage, JournalEntry } from '../types';
 import { sendChatMessage, generateEntrySummary } from '../services/api';
 import { saveUserJournal } from '../services/firestore';
-import { BookLockVector, SparkleStar } from './BioVaultLogo';
+import { BookLockVector, OpenBookIcon, BarChartIcon, SparkleDoubleIcon } from './BioVaultLogo';
 import DOMPurify from 'dompurify';
 import confetti from 'canvas-confetti';
 import { 
   Mic, 
   Check, 
   RotateCcw, 
-  BookOpen, 
-  BarChart3, 
-  Sparkles, 
   Lock,
   RefreshCw,
   CheckCircle2
@@ -31,7 +28,6 @@ interface JournalChatProps {
 export const JournalChat: React.FC<JournalChatProps> = ({ 
   onEntrySaved, 
   openVoiceModal, 
-  openExportModal,
   recordedVoiceText,
   clearVoiceText,
   activeTab,
@@ -145,14 +141,59 @@ export const JournalChat: React.FC<JournalChatProps> = ({
 
   return (
     <div className="biovault-container">
-      {/* Left Vertical Inset Groove Track with Metallic Handle & Thread */}
+      {/* Left Vertical Slider — verified SVG, transparent background */}
       <div className="left-slider-track">
-        <div className="vertical-thread-line"></div>
-        <div className="slider-node"></div>
-        <div className="slider-node"></div>
-        <div className="slider-handle-pill"></div>
-        <div className="slider-node"></div>
-        <div className="slider-node"></div>
+        <svg width="100" height="600" viewBox="0 0 100 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            {/* Warm white halo glow behind diamond */}
+            <radialGradient id="halo" cx="50%" cy="50%" r="50%">
+              <stop offset="0%"   stopColor="#FFFEF5" stopOpacity="1"/>
+              <stop offset="40%"  stopColor="#F5EDCC" stopOpacity="0.7"/>
+              <stop offset="100%" stopColor="#C8A84A" stopOpacity="0"/>
+            </radialGradient>
+            {/* Amber/brass pill gradient left→right */}
+            <linearGradient id="pillAmber" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%"   stopColor="#E8C45A"/>
+              <stop offset="35%"  stopColor="#C08820"/>
+              <stop offset="100%" stopColor="#7A5010"/>
+            </linearGradient>
+          </defs>
+
+          {/* ① Full-height cream pole — thick, rounded ends */}
+          <rect x="42" y="0" width="16" height="600" rx="8" fill="#EDE0C0"/>
+          <rect x="46"   y="0" width="2"   height="600" fill="#D4BF88" opacity="0.45"/>
+          <rect x="50.5" y="0" width="1.2" height="600" fill="#F8F0E0" opacity="0.35"/>
+
+          {/* ② Top bracket — 3 dots, 2 C-curve arcs bowing LEFT */}
+          <path d="M50 105 C30 105, 18 130, 18 158"
+                stroke="#8B3030" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+          <path d="M18 158 C18 186, 30 200, 50 200"
+                stroke="#8B3030" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+          <circle cx="50" cy="105" r="5.5" fill="#7A2418"/>
+          <circle cx="18" cy="158" r="5.5" fill="#7A2418"/>
+          <circle cx="50" cy="200" r="5.5" fill="#7A2418"/>
+
+          {/* ③ Bottom bracket — same shape, lower */}
+          <path d="M50 390 C30 390, 18 415, 18 443"
+                stroke="#8B3030" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+          <path d="M18 443 C18 471, 30 485, 50 485"
+                stroke="#8B3030" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+          <circle cx="50" cy="390" r="5.5" fill="#7A2418"/>
+          <circle cx="18" cy="443" r="5.5" fill="#7A2418"/>
+          <circle cx="50" cy="485" r="5.5" fill="#7A2418"/>
+
+          {/* ④ Warm white halo glow */}
+          <ellipse cx="50" cy="295" rx="62" ry="62" fill="url(#halo)"/>
+
+          {/* ⑤ Solid opaque cream diamond */}
+          <path d="M50 242 L96 288 L50 334 L4 288 Z" fill="#F2ECD8" opacity="0.95"/>
+
+          {/* ⑥ Amber pill on top */}
+          <rect x="36" y="254" width="28" height="68" rx="14"
+                fill="url(#pillAmber)" stroke="#8A6020" strokeWidth="1.2"/>
+          <rect x="39" y="260" width="7" height="28" rx="3.5"
+                fill="white" opacity="0.28"/>
+        </svg>
       </div>
 
       {/* Main Folder Wrapper */}
@@ -166,19 +207,24 @@ export const JournalChat: React.FC<JournalChatProps> = ({
               className={`folder-tab-btn ${activeTab === 'chat' ? 'active' : ''}`}
               onClick={() => setActiveTab('chat')}
             >
-              <BookOpen className="nano-icon" /> Journal Vault
+              <OpenBookIcon size={30} />
+              <span className="tab-label-text">Journal<br/>Vault</span>
             </button>
+
             <button
               className={`folder-tab-btn ${activeTab === 'analytics' ? 'active' : ''}`}
               onClick={() => setActiveTab('analytics')}
             >
-              <BarChart3 className="nano-icon" /> Mood Spectrum
+              <BarChartIcon size={30} />
+              <span className="tab-label-text">Mood<br/>Spectrum</span>
             </button>
+
             <button
               className={`folder-tab-btn ${activeTab === 'insights' ? 'active' : ''}`}
               onClick={() => setActiveTab('insights')}
             >
-              <Sparkles className="nano-icon" /> AI Insights
+              <SparkleDoubleIcon size={30} />
+              <span className="tab-label-text">AI<br/>Insights</span>
             </button>
           </div>
         </div>
@@ -200,7 +246,14 @@ export const JournalChat: React.FC<JournalChatProps> = ({
               <div key={m.id} className={`message-bubble-biovault ${m.role}`}>
                 <div className="archive-welcome-text">
                   {m.text.split('\n').map((line, i) => (
-                    <p key={i}>{line}</p>
+                    <p key={i}>
+                      {line.split(/(\*\*.*?\*\*)/g).map((part, j) => {
+                        if (part.startsWith('**') && part.endsWith('**')) {
+                          return <strong key={j}>{part.slice(2, -2)}</strong>;
+                        }
+                        return part;
+                      })}
+                    </p>
                   ))}
                 </div>
               </div>
@@ -283,8 +336,7 @@ export const JournalChat: React.FC<JournalChatProps> = ({
             </div>
           </div>
 
-          {/* Sparkle Star Accent Glimmer (✦) at Bottom Right */}
-          <SparkleStar size={24} className="sparkle-accent-floating" />
+
         </div>
       </div>
     </div>

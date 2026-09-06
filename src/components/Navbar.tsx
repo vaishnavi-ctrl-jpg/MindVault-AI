@@ -1,6 +1,5 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
-import { TreeRingLogo } from './BioVaultLogo';
 import { Upload, Key, LogOut } from 'lucide-react';
 
 interface NavbarProps {
@@ -23,10 +22,14 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="navbar-inner">
         {/* Brand Header Left */}
         <div className="brand-section" onClick={openSecurityModal}>
-          <TreeRingLogo size={48} />
+          <img
+            src="/logo-treering-transparent.png"
+            alt="BioVault Tree Ring Logo"
+            className="treering-logo-img"
+          />
           <div>
             <h1 className="brand-title">BioVault</h1>
-            <p className="brand-subtitle">Secure Personal Journal & Knowledge Database</p>
+            <p className="brand-subtitle">Secure Personal Journal &amp; Knowledge Database</p>
           </div>
         </div>
 

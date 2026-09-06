@@ -40,7 +40,7 @@
 
 body {
   font-family: var(--font-sans);
-  background-color: var(--bg-canvas);
+  background-color: #EAE3D2;
   color: var(--color-charcoal);
   min-height: 100vh;
   overflow-x: hidden;
@@ -48,28 +48,60 @@ body {
   position: relative;
 }
 
-/* Organic Flowing Layered Wave Overlay (Top Right & Bottom Left Curves) */
+/* Organic flowing wave layers — right side, matching inspo */
 body::before {
   content: '';
   position: fixed;
   top: 0;
   right: 0;
-  width: 55vw;
+  width: 65vw;
   height: 100vh;
-  background-image: 
-    radial-gradient(ellipse at 100% 0%, rgba(226, 214, 192, 0.8) 0%, transparent 60%),
-    radial-gradient(ellipse at 90% 40%, rgba(139, 128, 101, 0.18) 0%, transparent 70%),
-    radial-gradient(ellipse at 100% 100%, rgba(163, 72, 54, 0.15) 0%, transparent 60%);
+  background-image:
+    radial-gradient(ellipse at 100% 15%, rgba(210, 185, 145, 0.85) 0%, transparent 55%),
+    radial-gradient(ellipse at 85%  55%, rgba(195, 168, 120, 0.55) 0%, transparent 55%),
+    radial-gradient(ellipse at 100% 90%, rgba(180, 140, 100, 0.45) 0%, transparent 60%),
+    radial-gradient(ellipse at 60%  80%, rgba(163,  72,  54, 0.10) 0%, transparent 50%);
   pointer-events: none;
   z-index: 0;
 }
 
-/* Scrollbar */
+/* Soft inner wave — bottom-left organic blob */
+body::after {
+  content: '';
+  position: fixed;
+  bottom: -60px;
+  left: -40px;
+  width: 45vw;
+  height: 55vh;
+  background: radial-gradient(ellipse at 20% 80%, rgba(210, 185, 145, 0.5) 0%, transparent 65%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+
+
+
+
+
+/* Scrollbar — hidden on main page, functional inside scroll containers only */
+html, body {
+  height: 100vh;
+  overflow: hidden;
+  scrollbar-width: none;
+}
+
+/* Hide scrollbar webkit */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+}
+
+/* Inner scroll areas (e.g. chat) still get a slim scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg-canvas);
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
   background: var(--color-olive);
@@ -79,10 +111,18 @@ body::before {
   background: var(--color-rust);
 }
 
+/* Firefox for inner elements */
+.archive-chat-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-olive) transparent;
+}
+
 .app-layout {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
   position: relative;
   z-index: 1;
 }
@@ -92,7 +132,10 @@ body::before {
   max-width: 1260px;
   width: 100%;
   margin: 0 auto;
-  padding: 1.5rem 2rem 3rem;
+  padding: 1rem 2rem 1.5rem;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -121,6 +164,13 @@ body::before {
   align-items: center;
   gap: 1.1rem;
   cursor: pointer;
+}
+
+.treering-logo-img {
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 3px 6px rgba(67, 66, 37, 0.35));
 }
 
 .brand-title {
@@ -284,58 +334,26 @@ body::before {
   position: relative;
 }
 
-/* Left Vertical Slider Track (Inset Groove with Metallic Handle & Thread) */
+/* Left Vertical Slider Track — now an SVG holder */
 .left-slider-track {
-  width: 32px;
-  height: 480px;
-  background: rgba(139, 128, 101, 0.18);
-  border: 1px solid rgba(139, 128, 101, 0.3);
-  border-radius: 20px;
-  padding: 1.5rem 0;
+  width: 100px;
+  height: 600px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   position: relative;
-  box-shadow: inset 0 2px 6px rgba(67, 66, 37, 0.12);
   flex-shrink: 0;
+  overflow: visible;
 }
 
-.vertical-thread-line {
-  position: absolute;
-  top: 30px;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 2px;
-  background: var(--color-olive);
-  opacity: 0.5;
-}
-
-.slider-node {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--color-rust);
-  border: 2px solid var(--bg-canvas);
-  position: relative;
-  z-index: 2;
-}
-
-/* Metallic Brass Pill Slider Handle */
+.vertical-thread-line,
+.slider-node,
 .slider-handle-pill {
-  width: 18px;
-  height: 54px;
-  border-radius: 12px;
-  background: var(--brass-gradient);
-  box-shadow: var(--brass-shadow);
-  position: absolute;
-  top: 48%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  cursor: pointer;
-  z-index: 3;
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  display: none; /* legacy divs hidden, SVG takes over */
 }
 
 /* Main Folder Wrapper */
@@ -597,10 +615,10 @@ body::before {
 /* Sparkle Star Accent Glimmer (✦) at Bottom Right */
 .sparkle-accent-floating {
   position: absolute;
-  right: -12px;
-  bottom: 24px;
+  right: 18px;
+  bottom: 20px;
   color: #FAF6EE;
-  opacity: 0.9;
+  opacity: 0.85;
   filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.8));
   pointer-events: none;
 }
