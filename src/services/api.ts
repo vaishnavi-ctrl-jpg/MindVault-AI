@@ -1,9 +1,17 @@
 import { AIPersona, ChatMessage, SentimentScores } from '../types';
+import { auth } from '../config/firebase';
 
 const API_BASE = '/api';
 
-function getAuthHeaders(userUid?: string): Record<string, string> {
-  const token = userUid || 'authenticated-sandbox-user-session-token-' + Date.now();
+async function getAuthHeaders(): Promise<Record<string, string>> {
+  let token = 'unauthenticated-fallback-token';
+  if (auth.currentUser) {
+    try {
+      token = await auth.currentUser.getIdToken(true);
+    } catch (e) {
+      console.warn('Failed to retrieve Firebase ID token', e);
+    }
+  }
   return {
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${token}`
@@ -36,9 +44,10 @@ export async function sendChatMessage(
   userUid?: string
 ): Promise<string> {
   try {
+    const headers = await getAuthHeaders();
     const res = await fetch(`${API_BASE}/chat`, {
       method: 'POST',
-      headers: getAuthHeaders(userUid),
+      headers,
       body: JSON.stringify({ history, message, persona })
     });
 
@@ -72,9 +81,10 @@ export async function generateEntrySummary(conversationText: string, userUid?: s
   emotionalTone: string;
 }> {
   try {
+    const headers = await getAuthHeaders();
     const res = await fetch(`${API_BASE}/summarize`, {
       method: 'POST',
-      headers: getAuthHeaders(userUid),
+      headers,
       body: JSON.stringify({ conversationText })
     });
 
@@ -107,9 +117,10 @@ export async function generateEntrySummary(conversationText: string, userUid?: s
 
 export async function fetchAIInsights(entries: any[], userUid?: string) {
   try {
+    const headers = await getAuthHeaders();
     const res = await fetch(`${API_BASE}/insights`, {
       method: 'POST',
-      headers: getAuthHeaders(userUid),
+      headers,
       body: JSON.stringify({ journalEntries: entries })
     });
 

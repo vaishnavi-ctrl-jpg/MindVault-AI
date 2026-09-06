@@ -77,21 +77,35 @@ async function getGenAIInstance() {
   return new GoogleGenerativeAI(apiKey);
 }
 
+import admin from 'firebase-admin';
+
+admin.initializeApp({
+  projectId: process.env.VITE_FIREBASE_PROJECT_ID || 'phrasal-alpha-493811-m4'
+});
+
 /**
- * STRIDE Mitigation Directive #1: Authentication Token Verification Middleware
+ * STRIDE Mitigation Directive #1: Authentication Token Verification Middleware (REAL)
  */
-function verifyAuthTokenMiddleware(req, res, next) {
+async function verifyAuthTokenMiddleware(req, res, next) {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'Unauthorized: Missing or invalid Bearer authentication token header.' });
   }
   const token = authHeader.split('Bearer ')[1];
+  
   if (!token || token.length < 5) {
-    return res.status(401).json({ error: 'Unauthorized: Invalid token signature.' });
+    return res.status(401).json({ error: 'Unauthorized: Invalid token format.' });
   }
-  // Store validated token context
-  req.userToken = token;
-  next();
+
+  try {
+    const decodedToken = await admin.auth().verifyIdToken(token);
+    req.userToken = token;
+    req.user = decodedToken;
+    next();
+  } catch (error) {
+    console.error('[Auth Error] Token verification failed:', error.message);
+    return res.status(401).json({ error: 'Unauthorized: Invalid token signature or expired token.' });
+  }
 }
 
 // Zod Input Schemas
@@ -108,9 +122,18 @@ const SummarizeRequestSchema = z.object({
   conversationText: z.string().min(1, 'Conversation text cannot be empty')
 });
 
+const InsightsRequestSchema = z.object({
+  journalEntries: z.array(z.object({
+    date: z.string().optional(),
+    title: z.string().optional(),
+    emotionalTone: z.string().optional(),
+    summary: z.string().optional()
+  })).optional()
+});
+
 // System Directive for Gemini Journaling Assistant
 const BASE_SYSTEM_INSTRUCTION = `
-You are MindVault AI, an empathetic, secure, and insightful personal AI journaling companion.
+You are BioVault AI, an empathetic, secure, and insightful personal AI journaling companion.
 Your goal is to help the user unpack their thoughts, reflect deeply on their emotions, brainstorm solutions, and gain personal growth clarity.
 Directives:
 1. Always maintain a warm, non-judgmental, encouraging, and highly thoughtful tone.
@@ -126,7 +149,7 @@ app.get('/', (req, res) => {
     <!DOCTYPE html>
     <html>
       <head>
-        <title>MindVault AI Backend Service</title>
+        <title>BioVault AI Backend Service</title>
         <style>
           body { font-family: system-ui, sans-serif; background: #090d16; color: #f8fafc; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
           .card { background: #111827; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 2.5rem; max-width: 500px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
@@ -139,7 +162,7 @@ app.get('/', (req, res) => {
       <body>
         <div class="card">
           <div class="badge">● Server Active & Online</div>
-          <h1>🧠 MindVault AI Backend API</h1>
+          <h1>🧠 BioVault AI Backend API</h1>
           <p>This is the server-side Express proxy service handling GCP Secret Manager key retrieval, Bearer token authentication, rate limiting, and Gemini API streaming.</p>
           <p>To use the full Personal Gemini Journal application, visit the frontend server at port 3000:</p>
           <a href="http://localhost:3000" class="btn">Open Web Application (localhost:3000)</a>
@@ -282,8 +305,13 @@ Respond ONLY with valid JSON inside a code block like \`\`\`json { ... } \`\`\`.
 // Semantic Memory & Pattern Insight Engine with Auth Verification
 app.post('/api/insights', verifyAuthTokenMiddleware, async (req, res) => {
   try {
-    const { journalEntries } = req.body;
-    if (!Array.isArray(journalEntries) || journalEntries.length === 0) {
+    const parseResult = InsightsRequestSchema.safeParse(req.body);
+    if (!parseResult.success) {
+      return res.status(400).json({ error: 'Invalid input schema', details: parseResult.error.format() });
+    }
+
+    const { journalEntries } = parseResult.data;
+    if (!journalEntries || journalEntries.length === 0) {
       return res.json({
         overallInsight: 'Keep journaling! As you log more entries, Gemini will analyze your recurring themes, emotional trends, and growth milestones over time.',
         recommendedPrompts: [
@@ -299,7 +327,7 @@ app.post('/api/insights', verifyAuthTokenMiddleware, async (req, res) => {
     const entrySummaries = journalEntries.map((e, idx) => `[Entry ${idx + 1} - ${e.date}]: Title: ${e.title} | Tone: ${e.emotionalTone} | Summary: ${e.summary}`).join('\n');
 
     const prompt = `
-You are MindVault's Cognitive Pattern Intelligence Engine.
+You are BioVault's Cognitive Pattern Intelligence Engine.
 Analyze these recent journal entry summaries for a single user:
 
 ${entrySummaries}
@@ -342,7 +370,7 @@ Respond ONLY with valid JSON inside \`\`\`json { ... } \`\`\`.
 
 app.listen(PORT, () => {
   console.log(`=======================================================`);
-  console.log(`🧠 MindVault AI Server listening on port ${PORT}`);
+  console.log(`🧠 BioVault AI Server listening on port ${PORT}`);
   console.log(`🔒 Secret Management: GCP Secret Manager / Secure Proxy`);
   console.log(`🛡️ Rate Limiting & Zod Schema Validation: ACTIVE`);
   console.log(`=======================================================`);

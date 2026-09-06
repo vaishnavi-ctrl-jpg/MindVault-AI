@@ -1,4 +1,4 @@
-# 🧠 MindVault AI: Secure Personal Gemini Journal & Reflection Studio
+# 🧠 BioVault AI: Secure Personal Gemini Journal & Reflection Studio
 
 > **APAC Gen AI Academy Cohort 3 - Ideathon Challenge Submission**  
 > **Built with**: Google AI Studio, Google Gemini API, Firebase Auth, Cloud Firestore, Google Cloud Secret Manager, React, TypeScript, Chart.js  
@@ -9,7 +9,7 @@
 
 Most AI-generated apps fall short in production due to hardcoded API keys, missing authorization boundaries, and shared database tables without user isolation. 
 
-**MindVault AI** solves this by establishing an enterprise **Google AI Studio Security Constitution** *before writing a single line of code*. The result is a production-grade, zero-trust authenticated journaling & reflection web application where each user signs in, brainstorms with Gemini in multi-turn conversations, receives automated cognitive summaries, and stores their reflections in strictly isolated database subcollections.
+**BioVault AI** solves this by establishing an enterprise **Google AI Studio Security Constitution** *before writing a single line of code*. The result is a production-grade, zero-trust authenticated journaling & reflection web application where each user signs in, brainstorms with Gemini in multi-turn conversations, receives automated cognitive summaries, and stores their reflections in strictly isolated database subcollections.
 
 ---
 
@@ -28,7 +28,7 @@ Most AI-generated apps fall short in production due to hardcoded API keys, missi
 - 📊 **Feature 1: Mood & Cognitive Spectrum Analytics**: Interactive Chart.js radar & line graphs tracking Positivity, Clarity, Energy, and Anxiety metrics extracted from Gemini's emotional sentiment analysis.
 - 🎙️ **Feature 2: Audio/Voice AI Journaling**: Real-time Web Speech API voice recorder with live waveform visualization, automatic speech-to-text, and direct prompt transfer.
 - 🧠 **Feature 3: Cognitive Pattern & Reflection Insights Engine**: Synthetic memory analyzer that scans historical entries, highlights recurring themes, and suggests tailored reflection prompts.
-- 🔒 **Feature 4: Zero-Knowledge Encrypted Vault Export**: Client-side AES-256 encrypted export of all journals to Markdown (`.md`), JSON (`.json`), or encrypted `.mindvault` files.
+- 🔒 **Feature 4: Zero-Knowledge Encrypted Vault Export**: Client-side AES-256 encrypted export of all journals to Markdown (`.md`), JSON (`.json`), or encrypted `.BioVault` files.
 
 ---
 

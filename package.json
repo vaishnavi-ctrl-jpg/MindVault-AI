@@ -1,5 +1,5 @@
 {
-  "name": "gemini-mindvault-journal",
+  "name": "gemini-biovault-journal",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -21,6 +21,7 @@
     "express": "^4.21.2",
     "express-rate-limit": "^7.5.0",
     "firebase": "^11.4.0",
+    "firebase-admin": "^14.3.0",
     "lucide-react": "^0.475.0",
     "react": "^18.3.1",
     "react-chartjs-2": "^5.3.0",
