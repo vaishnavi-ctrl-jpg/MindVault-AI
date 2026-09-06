@@ -143,33 +143,18 @@ Directives:
 5. If asked about safety or capabilities, emphasize end-to-end security and isolated database rules.
 `;
 
-// Root Status Endpoint for Browser Verification
-app.get('/', (req, res) => {
-  res.send(`
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <title>BioVault AI Backend Service</title>
-        <style>
-          body { font-family: system-ui, sans-serif; background: #090d16; color: #f8fafc; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-          .card { background: #111827; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 2.5rem; max-width: 500px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-          h1 { color: #6366f1; margin-top: 0; }
-          p { color: #94a3b8; font-size: 0.95rem; line-height: 1.5; }
-          .badge { display: inline-block; background: rgba(16,185,129,0.15); color: #10b981; padding: 0.3rem 0.8rem; border-radius: 20px; font-weight: bold; font-size: 0.8rem; margin-bottom: 1rem; }
-          .btn { display: inline-block; background: linear-gradient(135deg, #6366f1, #a855f7); color: white; text-decoration: none; padding: 0.75rem 1.5rem; border-radius: 12px; font-weight: bold; margin-top: 1rem; }
-        </style>
-      </head>
-      <body>
-        <div class="card">
-          <div class="badge">● Server Active & Online</div>
-          <h1>🧠 BioVault AI Backend API</h1>
-          <p>This is the server-side Express proxy service handling GCP Secret Manager key retrieval, Bearer token authentication, rate limiting, and Gemini API streaming.</p>
-          <p>To use the full Personal Gemini Journal application, visit the frontend server at port 3000:</p>
-          <a href="http://localhost:3000" class="btn">Open Web Application (localhost:3000)</a>
-        </div>
-      </body>
-    </html>
-  `);
+import path from 'path';
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Serve frontend static files in production
+app.use(express.static(path.join(__dirname, '../dist')));
+
+// Fallback for React Router
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api')) return next();
+  res.sendFile(path.join(__dirname, '../dist/index.html'));
 });
 
 // API Health Check
