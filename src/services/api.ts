@@ -97,12 +97,12 @@ export async function generateEntrySummary(conversationText: string, userUid?: s
 
   await new Promise(r => setTimeout(r, 1100));
   return {
-    title: 'Cognitive Renewal & Vision Alignment',
-    summary: 'A deep journaling session focused on emotional regulation, clarifying core priorities, and charting actionable growth steps.',
+    title: '[Sandbox] Cognitive Renewal & Vision',
+    summary: '*[Sandbox Mode]* A deep journaling session focused on emotional regulation, clarifying core priorities, and charting actionable growth steps. (Sign in to generate authentic AI summaries of your personal entries.)',
     keyTakeaways: [
-      'Gained perspective on current stressors and emotional triggers.',
-      'Established a clear focus block for key priorities.',
-      'Practiced proactive mindfulness and self-compassion.'
+      '[Sample] Gained perspective on current stressors.',
+      '[Sample] Established a clear focus block.',
+      '[Sample] Practiced proactive mindfulness.'
     ],
     sentiment: {
       positivity: 82,
@@ -110,7 +110,7 @@ export async function generateEntrySummary(conversationText: string, userUid?: s
       energy: 74,
       anxiety: 15
     },
-    tags: ['#Mindfulness', '#PersonalGrowth', '#Focus', '#Clarity'],
+    tags: ['#Sandbox', '#Mindfulness', '#PersonalGrowth'],
     emotionalTone: 'Empowered & Reflective'
   };
 }
@@ -132,8 +132,8 @@ export async function fetchAIInsights(entries: any[], userUid?: string) {
   }
 
   return {
-    overallInsight: 'Across your recent journal entries, Gemini detected a strong upward trajectory in cognitive clarity and emotional resilience. You frequently write about career development, personal mindfulness, and structured goal setting.',
-    topThemes: ['Goal Alignment', 'Emotional Balance', 'Creative Focus'],
+    overallInsight: '*[Sandbox Mode]* Across your recent journal entries, Gemini detected a strong upward trajectory in cognitive clarity and emotional resilience. (This is a scripted guest response. Sign in with a secure account to unlock authentic AI pattern recognition on your saved entries.)',
+    topThemes: ['[Sample] Goal Alignment', '[Sample] Emotional Balance', '[Sample] Creative Focus'],
     recommendedPrompts: [
       'What single decision made this week brought you the highest sense of accomplishment?',
       'How can you simplify your morning routine to preserve focus energy?',
